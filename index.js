@@ -9,22 +9,28 @@ const storage = multer.diskStorage({
     filename: function (req, file, cb) {
         const uniqueSuffix = Date.now();
         const uploadedfileName = uniqueSuffix + '-' + file.originalname;
-        cb(null,uploadedfileName)
+        cb(null, uploadedfileName)
     }
 })
 
-const upload = multer({storage: storage})
+const upload = multer({ storage: storage }).single('imageFile')
 
 app.get('/', (req, res) => {
     res.send('Yo dawg');
 })
 
-app.post('/upload', upload.single('imageFile'), (req, res, next) => {
-    console.log(req.body);
-    console.log(req.file);
-    res.json({
-        message: "File successfully uploaded!"
-    });
+app.post('/upload', function (req, res) {
+    upload(req, res, function (err) {
+        if (err instanceof multer.MulterError) {
+            res.status(400).json({ error: 'Multer error: ' + err.message });
+        } else if (err) {
+            res.status(500).json({ error: 'An unknown error occurred: ' + err.message });
+        } else {
+            res.json({
+                message: "File successfully uploaded!"
+            });
+        }
+    })
 })
 
 app.listen(port, () => {
