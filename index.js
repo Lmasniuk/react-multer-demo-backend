@@ -8,7 +8,8 @@ const storage = multer.diskStorage({
     destination: './uploads',
     filename: function (req, file, cb) {
         const uniqueSuffix = Date.now();
-        cb(null,uniqueSuffix + '-' + file.originalname)
+        const uploadedfileName = uniqueSuffix + '-' + file.originalname;
+        cb(null,uploadedfileName)
     }
 })
 
@@ -21,7 +22,9 @@ app.get('/', (req, res) => {
 app.post('/upload', upload.single('imageFile'), (req, res, next) => {
     console.log(req.body);
     console.log(req.file);
-    res.send('Uploaded!');
+    res.json({
+        message: "File successfully uploaded!"
+    });
 })
 
 app.listen(port, () => {
